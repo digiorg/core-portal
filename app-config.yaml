@@ -1,0 +1,102 @@
+app:
+  title: DigiOrg Developer Portal
+  baseUrl: ${APP_BASE_URL}
+
+  packages: all
+
+  extensions:
+    - page:catalog:
+        config:
+          path: /
+
+organization:
+  name: DigiOrg
+
+backend:
+  baseUrl: ${BACKEND_BASE_URL}
+  listen:
+    port: 7007
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+    script-src: ["'self'", "'unsafe-inline'", "'unsafe-eval'"]
+    img-src: ["'self'", 'data:', 'https:']
+    upgrade-insecure-requests: false
+  cors:
+    origin: ${APP_BASE_URL}
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+
+# GitHub integration is optional - only enabled if GITHUB_TOKEN is set
+# integrations:
+#   github:
+#     - host: github.com
+#       token: ${GITHUB_TOKEN}
+
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'local'
+  publisher:
+    type: 'local'
+
+auth:
+  environment: production
+  # Session secret required for OIDC auth
+  session:
+    secret: ${AUTH_SESSION_SECRET}
+  # Configure sign-in page providers
+  signIn:
+    guest:
+      enabled: true
+    oidc:
+      title: Keycloak SSO
+      message: Sign in with Keycloak
+  providers:
+    oidc:
+      production:
+        metadataUrl: ${AUTH_OIDC_METADATA_URL}
+        clientId: ${AUTH_OIDC_CLIENT_ID}
+        clientSecret: ${AUTH_OIDC_CLIENT_SECRET}
+        prompt: auto
+        # Sign-in resolution handled by custom resolver in backend
+        # (see packages/backend/src/authModule.ts)
+
+scaffolder:
+  defaultAuthor:
+    name: DigiOrg Scaffolder
+    email: scaffolder@digiorg.local
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location, Template, User, Group]
+  locations:
+    - type: file
+      target: ../../examples/entities.yaml
+    - type: file
+      target: ../../examples/template/template.yaml
+      rules:
+        - allow: [Template]
+    - type: file
+      target: ../../examples/org.yaml
+      rules:
+        - allow: [User, Group]
+
+kubernetes:
+  serviceLocatorMethod:
+    type: 'multiTenant'
+  clusterLocatorMethods:
+    - type: 'config'
+      clusters: []
+
+permission:
+  enabled: true

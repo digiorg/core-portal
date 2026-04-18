@@ -1,0 +1,22 @@
+# Production configuration for DigiOrg Backstage
+# Environment variables are expected to be set in the Kubernetes deployment
+
+app:
+  baseUrl: ${APP_BASE_URL}
+
+backend:
+  baseUrl: ${BACKEND_BASE_URL}
+  listen:
+    port: 7007
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+  cors:
+    origin: ${APP_BASE_URL}
+
+auth:
+  environment: production
