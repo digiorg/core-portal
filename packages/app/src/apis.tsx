@@ -1,5 +1,6 @@
 import {
   ApiRef,
+  appThemeApiRef,
   configApiRef,
   createApiRef,
   discoveryApiRef,
@@ -13,7 +14,10 @@ import {
   ApiBlueprint,
   createFrontendModule,
 } from '@backstage/frontend-plugin-api';
-import { OAuth2 } from '@backstage/core-app-api';
+import { OAuth2, AppThemeSelector } from '@backstage/core-app-api';
+import { UnifiedThemeProvider } from '@backstage/theme';
+import { digiorgDarkTheme, digiorgLightTheme } from './themes/digiorgTheme';
+import { PropsWithChildren } from 'react';
 
 /**
  * API reference for Keycloak OIDC authentication
@@ -58,10 +62,46 @@ const keycloakOIDCAuthApi = ApiBlueprint.make({
     }),
 });
 
+/** Theme provider wrappers */
+const DigiOrgDarkThemeProvider = ({ children }: PropsWithChildren<{}>) => (
+  <UnifiedThemeProvider theme={digiorgDarkTheme}>{children}</UnifiedThemeProvider>
+);
+
+const DigiOrgLightThemeProvider = ({ children }: PropsWithChildren<{}>) => (
+  <UnifiedThemeProvider theme={digiorgLightTheme}>{children}</UnifiedThemeProvider>
+);
+
 /**
- * Frontend module that provides the Keycloak OIDC auth API
+ * DigiOrg Theme API — registers Dark and Light themes
+ */
+const digiorgThemeApi = ApiBlueprint.make({
+  name: 'app-theme',
+  params: defineParams =>
+    defineParams({
+      api: appThemeApiRef,
+      deps: {},
+      factory: () =>
+        AppThemeSelector.createWithStorage([
+          {
+            id: 'digiorg-dark',
+            title: 'DigiOrg Dark',
+            variant: 'dark',
+            Provider: DigiOrgDarkThemeProvider,
+          },
+          {
+            id: 'digiorg-light',
+            title: 'DigiOrg Light',
+            variant: 'light',
+            Provider: DigiOrgLightThemeProvider,
+          },
+        ]),
+    }),
+});
+
+/**
+ * Frontend module that provides Keycloak OIDC auth + DigiOrg themes
  */
 export const keycloakAuthApiModule = createFrontendModule({
   pluginId: 'app',
-  extensions: [keycloakOIDCAuthApi],
+  extensions: [keycloakOIDCAuthApi, digiorgThemeApi],
 });
