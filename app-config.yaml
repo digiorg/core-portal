@@ -4,6 +4,16 @@ app:
 
   packages: all
 
+  # DigiOrg Theme — dark by default, light available via Settings → Appearance
+  themes:
+    - id: digiorg-dark
+      title: DigiOrg Dark
+      variant: dark
+    - id: digiorg-light
+      title: DigiOrg Light
+      variant: light
+  defaultTheme: digiorg-dark
+
   extensions:
     - page:catalog:
         config:
