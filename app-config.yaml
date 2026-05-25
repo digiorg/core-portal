@@ -106,7 +106,48 @@ kubernetes:
     type: 'multiTenant'
   clusterLocatorMethods:
     - type: 'config'
-      clusters: []
+      clusters:
+        - name: digiorg-core-dev
+          url: ${KUBERNETES_API_URL}
+          authProvider: serviceAccount
+          serviceAccountToken: ${KUBERNETES_SERVICE_ACCOUNT_TOKEN}
+          skipTLSVerify: true
+
+kubernetesIngestor:
+  # Global settings
+  enabled: true
+  defaultOwner: platform-team
+  allowAllClusters: true
+
+  # Standard Kubernetes workload components
+  components:
+    enabled: true
+    disableDefaultWorkloadTypes: false
+
+  # Crossplane integration
+  crossplane:
+    enabled: true
+
+    # Ingest AppClaims as Backstage Component entities
+    claims:
+      ingestAllClaims: true
+      ingestAsResources: false
+
+    # Ingest AppClaim XRD as Backstage Template + API entity
+    xrds:
+      enabled: true
+      ingestAllXRDs: true
+      ingestOnlyAsAPI: false
+      convertDefaultValuesToPlaceholders: true
+
+      # Phase 1: catalog download (no git push required)
+      publishPhase:
+        target: catalog
+
+      # Refresh every 5 minutes
+      taskRunner:
+        frequency: 300
+        timeout: 300
 
 permission:
   enabled: true
