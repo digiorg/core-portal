@@ -1,0 +1,50 @@
+diff --git a/config.d.ts b/config.d.ts
+index d82f847c95a331a5da5a789ee5c8a4106f007031..2e0d054345324abc61e787389a8af38646475d3d 100644
+--- a/config.d.ts
++++ b/config.d.ts
+@@ -334,6 +334,12 @@ export interface Config {
+              * @visibility frontend
+              */
+             targetBranch?: string;
++            /**
++             * Subdirectory of the target repository to write the generated
++             * manifest into (e.g. "claims" for a shared app-config repo)
++             * @visibility frontend
++             */
++            targetPath?: string;
+           };
+         };
+         /**
+diff --git a/dist/providers/EntityProvider.cjs.js b/dist/providers/EntityProvider.cjs.js
+index 31953fd9f6952f0f4585a761f591727b22acdfb4..171c9729c63a1d7c634af54222d3c7b4942593ec 100644
+--- a/dist/providers/EntityProvider.cjs.js
++++ b/dist/providers/EntityProvider.cjs.js
+@@ -1204,6 +1204,9 @@ class XRDTemplateEntityProvider {
+       case "bitbucketcloud":
+         action = "publish:bitbucketCloud:pull-request";
+         break;
++      case "gitea":
++        action = "publish:gitea:pull-request";
++        break;
+       case "github":
+       default:
+         action = "publish:github:pull-request";
+@@ -1238,7 +1241,7 @@ class XRDTemplateEntityProvider {
+     title: Create {KIND} Resource \${{ parameters.xrName }}
+     description: Create {KIND} Resource \${{ parameters.xrName }}
+     targetBranchName: ${this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.publishPhase.git.targetBranch")}
+-` + userOAuthTokenInput;
++` + (this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.publishPhase.git.targetPath") ? `    targetPath: ${this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.publishPhase.git.targetPath")}\n` : "") + userOAuthTokenInput;
+         defaultStepsYaml += repoHardcodedStepsYaml;
+       }
+     }
+@@ -1943,6 +1946,9 @@ class XRDTemplateEntityProvider {
+       case "bitbucketcloud":
+         action = "publish:bitbucketCloud:pull-request";
+         break;
++      case "gitea":
++        action = "publish:gitea:pull-request";
++        break;
+       case "github":
+       default:
+         action = "publish:github:pull-request";

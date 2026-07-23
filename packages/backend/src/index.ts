@@ -19,6 +19,10 @@ backend.add(import('@backstage/plugin-scaffolder-backend-module-github'));
 backend.add(
   import('@backstage/plugin-scaffolder-backend-module-notifications'),
 );
+// Gitea publish:gitea:pull-request action for AppClaim GitOps delivery
+import { giteaModule } from './gitea/module';
+
+backend.add(giteaModule);
 
 // techdocs plugin
 backend.add(import('@backstage/plugin-techdocs-backend'));
