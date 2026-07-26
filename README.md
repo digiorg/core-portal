@@ -30,6 +30,41 @@ ghcr.io/digiorg/core-backstage-image:latest
 | `AUTH_OIDC_CLIENT_ID` | Keycloak client ID | `backstage` |
 | `AUTH_OIDC_CLIENT_SECRET` | Keycloak client secret | (secret) |
 | `GITHUB_TOKEN` | GitHub PAT for integrations | (secret) |
+| `GITEA_TOKEN` | Dedicated least-privilege Gitea identity token used by the `publish:gitea:pull-request` scaffolder action to open AppClaim GitOps pull requests (see `integrations.gitea` in `app-config.yaml`). Never the Gitea platform admin/bootstrap token. | (secret) |
+
+## AppClaim GitOps Delivery (issue #285)
+
+The dynamically generated AppClaim scaffolder templates publish the generated
+manifest as a pull request to a dedicated Gitea GitOps repository, using the
+`publish:gitea:pull-request` action registered in
+`packages/backend/src/gitea/module.ts`:
+
+- **Integration**: `integrations.gitea` in `app-config.yaml`, host
+  `digiorg.local` (trusted ingress, HTTPS), credential from `GITEA_TOKEN`.
+- **Destination**: `kubernetesIngestor.crossplane.xrds.publishPhase` targets
+  the `DigiOrg/app-config` repository, `main` branch, under the `claims/`
+  path (`publishPhase.git.targetPath`, added via the TeraSky patch below).
+- **Fixed target**: `allowRepoSelection: false`, so every AppClaim is
+  delivered to the same repo/branch/path; the wizard never falls back to
+  GitHub.
+- The action reads the Gitea token exclusively from the configured
+  `integrations.gitea` entry — it never accepts or logs a token supplied by
+  a template step — and every Gitea API call it makes is a single bounded,
+  timed-out request (see `packages/backend/src/gitea/giteaClient.ts`).
+- Every changed file is committed in a single request via Gitea's batch
+  "change files" API (`changeFiles`), so publishing N generated manifest
+  files produces exactly one commit, not N.
+- Re-running a submission is idempotent: an existing branch, an unchanged
+  file, or an already-open pull request matching both the head **and** base
+  branch are detected and reused rather than duplicated. Open-PR lookup
+  paginates through every open pull request, not just the first page.
+
+`@terasky/backstage-plugin-kubernetes-ingestor@3.15.0` has no built-in
+`gitea` target and no way to place generated manifests under a fixed
+subdirectory of a shared repo, so both are added via the Yarn patch at
+`.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch`
+(regression-tested in
+`packages/backend/src/gitea/kubernetesIngestorGiteaPatch.test.ts`).
 
 ## Local Development
 

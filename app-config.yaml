@@ -43,8 +43,28 @@ backend:
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
 
+# Gitea integration for the AppClaim GitOps delivery pull-request action
+# (publish:gitea:pull-request). The token is a dedicated least-privilege
+# Gitea identity, never the platform bootstrap/admin token; see issue #285.
+#
+# Transport (Issue #285 TLS hardening): `baseUrl` goes through the trusted
+# digiorg.local ingress over HTTPS (CA: cert-manager/digiorg-local-ca-secret),
+# not the raw in-cluster gitea-http Service DNS name over plain HTTP. The
+# Backstage container already mounts that CA and sets NODE_EXTRA_CA_CERTS
+# (core/platform/base/backstage/deployment.yaml), so there is no remaining
+# reason to route around ingress+TLS for this credential-bearing path.
+# `baseUrl` is a fixed, operator-supplied config value -- never influenced by
+# a scaffolder template's `repoUrl` input (see
+# publishGiteaPullRequestAction.ts, which only ever reads
+# `giteaIntegration.config.baseUrl`) -- so this pinned host cannot be
+# redirected to an untrusted endpoint, TLS or not, by a submitted AppClaim.
+integrations:
+  gitea:
+    - host: digiorg.local
+      baseUrl: https://digiorg.local/gitea
+      password: ${GITEA_TOKEN}
+
 # GitHub integration is optional - only enabled if GITHUB_TOKEN is set
-# integrations:
 #   github:
 #     - host: github.com
 #       token: ${GITHUB_TOKEN}
@@ -140,9 +160,17 @@ kubernetesIngestor:
       ingestOnlyAsAPI: false
       convertDefaultValuesToPlaceholders: true
 
-      # Phase 1: catalog download (no git push required)
+      # Publish generated AppClaim manifests as a pull request against the
+      # dedicated Gitea app-config GitOps repository (issue #285). Fixed
+      # destination (allowRepoSelection: false) so every AppClaim lands
+      # under the same repo/branch/path that Argo CD reconciles.
       publishPhase:
-        target: catalog
+        target: gitea
+        allowRepoSelection: false
+        git:
+          repoUrl: digiorg.local?owner=DigiOrg&repo=app-config
+          targetBranch: main
+          targetPath: claims
 
       # Refresh every 5 minutes
       taskRunner:
