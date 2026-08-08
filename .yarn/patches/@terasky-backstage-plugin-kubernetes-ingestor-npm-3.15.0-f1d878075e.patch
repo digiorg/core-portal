@@ -1,8 +1,20 @@
 diff --git a/config.d.ts b/config.d.ts
-index d82f847c95a331a5da5a789ee5c8a4106f007031..2e0d054345324abc61e787389a8af38646475d3d 100644
+index d82f847c95a331a5da5a789ee5c8a4106f007031..19bdfa76102a8658f00bdc88aa2c4fc80a79a374 100644
 --- a/config.d.ts
 +++ b/config.d.ts
-@@ -334,6 +334,12 @@ export interface Config {
+@@ -293,6 +293,11 @@ export interface Config {
+          * @visibility frontend
+          */
+         ingestAllXRDs?: boolean;
++        /**
++         * Namespace in which generated namespaced Crossplane claims are hosted
++         * @visibility frontend
++         */
++        claimNamespace?: string;
+         /**
+          * Configuration for the publish phase in scaffolder templates
+          */
+@@ -334,6 +339,12 @@ export interface Config {
               * @visibility frontend
               */
              targetBranch?: string;
@@ -16,10 +28,32 @@ index d82f847c95a331a5da5a789ee5c8a4106f007031..2e0d054345324abc61e787389a8af386
          };
          /**
 diff --git a/dist/providers/EntityProvider.cjs.js b/dist/providers/EntityProvider.cjs.js
-index 31953fd9f6952f0f4585a761f591727b22acdfb4..171c9729c63a1d7c634af54222d3c7b4942593ec 100644
+index 31953fd9f6952f0f4585a761f591727b22acdfb4..64102601880642f2b3f5b49decabfb69c1ae7d19 100644
 --- a/dist/providers/EntityProvider.cjs.js
 +++ b/dist/providers/EntityProvider.cjs.js
-@@ -1204,6 +1204,9 @@ class XRDTemplateEntityProvider {
+@@ -584,6 +584,7 @@ class XRDTemplateEntityProvider {
+   }
+   extractParameters(version, clusters, xrd) {
+     const normalizedClusters = clusters.map((cluster) => this.getNormalizedClusterName(cluster));
++    const claimNamespace = this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.claimNamespace");
+     const isV2 = !!xrd.spec?.scope;
+     const scope = xrd.spec?.scope || (isV2 ? "LegacyCluster" : "Cluster");
+     const isLegacyCluster = isV2 && scope === "LegacyCluster";
+@@ -612,6 +613,13 @@ class XRDTemplateEntityProvider {
+         maxLength: 63,
+         type: "string"
+       };
++      if (claimNamespace) {
++        Object.assign(mainParameterGroup.properties.xrNamespace, {
++          default: claimNamespace,
++          enum: [claimNamespace],
++          "ui:widget": "hidden"
++        });
++      }
+     }
+     mainParameterGroup.properties.owner = {
+       title: "Owner",
+@@ -1204,6 +1212,9 @@ class XRDTemplateEntityProvider {
        case "bitbucketcloud":
          action = "publish:bitbucketCloud:pull-request";
          break;
@@ -29,7 +63,7 @@ index 31953fd9f6952f0f4585a761f591727b22acdfb4..171c9729c63a1d7c634af54222d3c7b4
        case "github":
        default:
          action = "publish:github:pull-request";
-@@ -1238,7 +1241,7 @@ class XRDTemplateEntityProvider {
+@@ -1238,7 +1249,7 @@ class XRDTemplateEntityProvider {
      title: Create {KIND} Resource \${{ parameters.xrName }}
      description: Create {KIND} Resource \${{ parameters.xrName }}
      targetBranchName: ${this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.publishPhase.git.targetBranch")}
@@ -38,7 +72,7 @@ index 31953fd9f6952f0f4585a761f591727b22acdfb4..171c9729c63a1d7c634af54222d3c7b4
          defaultStepsYaml += repoHardcodedStepsYaml;
        }
      }
-@@ -1943,6 +1946,9 @@ class XRDTemplateEntityProvider {
+@@ -1943,6 +1954,9 @@ class XRDTemplateEntityProvider {
        case "bitbucketcloud":
          action = "publish:bitbucketCloud:pull-request";
          break;
