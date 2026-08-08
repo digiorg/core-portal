@@ -47,6 +47,12 @@ manifest as a pull request to a dedicated Gitea GitOps repository, using the
 - **Fixed target**: `allowRepoSelection: false`, so every AppClaim is
   delivered to the same repo/branch/path; the wizard never falls back to
   GitHub.
+- **Namespace contract**: generated AppClaim manifests always set
+  `metadata.namespace: app-claims`, sourced from the fixed and hidden
+  `kubernetesIngestor.crossplane.xrds.claimNamespace` field. The separate
+  user-controlled `appName` (for example, `myapp`) remains in `spec`; the
+  Crossplane Composition creates that workload namespace later. The portal
+  does not pre-create the workload namespace.
 - The action reads the Gitea token exclusively from the configured
   `integrations.gitea` entry — it never accepts or logs a token supplied by
   a template step — and every Gitea API call it makes is a single bounded,

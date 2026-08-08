@@ -20,6 +20,18 @@ function readPatch(): string {
   return fs.readFileSync(PATCH_PATH, 'utf8');
 }
 
+function readInstalledProvider(): string {
+  const packageDir = path.dirname(
+    require.resolve(
+      '@terasky/backstage-plugin-kubernetes-ingestor/package.json',
+    ),
+  );
+  return fs.readFileSync(
+    path.join(packageDir, 'dist/providers/EntityProvider.cjs.js'),
+    'utf8',
+  );
+}
+
 describe('TeraSky kubernetes-ingestor gitea patch', () => {
   it('exists on disk', () => {
     expect(fs.existsSync(PATCH_PATH)).toBe(true);
@@ -27,7 +39,9 @@ describe('TeraSky kubernetes-ingestor gitea patch', () => {
 
   it('touches only config.d.ts and the EntityProvider dist file', () => {
     const patch = readPatch();
-    const touchedFiles = [...patch.matchAll(/^diff --git a\/(\S+) b\/\S+$/gm)].map(m => m[1]);
+    const touchedFiles = [
+      ...patch.matchAll(/^diff --git a\/(\S+) b\/\S+$/gm),
+    ].map(m => m[1]);
     expect(touchedFiles.sort()).toEqual(
       ['config.d.ts', 'dist/providers/EntityProvider.cjs.js'].sort(),
     );
@@ -57,6 +71,25 @@ describe('TeraSky kubernetes-ingestor gitea patch', () => {
   it('declares targetPath as an optional config schema key so it is not rejected as unknown config', () => {
     const patch = readPatch();
     expect(patch).toContain('targetPath?: string;');
+  });
+
+  it('declares claimNamespace as an optional XRD config schema key', () => {
+    const patch = readPatch();
+    expect(patch).toContain('claimNamespace?: string;');
+  });
+
+  it('fixes and hides xrNamespace only when claimNamespace is configured', () => {
+    const patch = readPatch();
+    const provider = readInstalledProvider();
+    expect(patch).toContain(
+      'this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.claimNamespace")',
+    );
+    expect(patch).toMatch(
+      /\+ {6}if \(claimNamespace\) \{\n\+ {8}Object\.assign\(mainParameterGroup\.properties\.xrNamespace, \{\n\+ {10}default: claimNamespace,\n\+ {10}enum: \[claimNamespace\],\n\+ {10}"ui:widget": "hidden"/,
+    );
+    expect(provider).toContain(
+      'if (isV2 && isNamespaced || !isV2 || isLegacyCluster) {',
+    );
   });
 
   it('does not add a token/credential input to the generated step or schema', () => {

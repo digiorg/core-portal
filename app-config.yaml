@@ -159,6 +159,7 @@ kubernetesIngestor:
       ingestAllXRDs: true
       ingestOnlyAsAPI: false
       convertDefaultValuesToPlaceholders: true
+      claimNamespace: app-claims
 
       # Publish generated AppClaim manifests as a pull request against the
       # dedicated Gitea app-config GitOps repository (issue #285). Fixed

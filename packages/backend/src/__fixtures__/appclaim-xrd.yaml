@@ -21,6 +21,9 @@ spec:
             spec:
               type: object
               properties:
+                appName:
+                  description: The workload identity and namespace created by Crossplane
+                  type: string
                 parameters:
                   type: object
                   properties:

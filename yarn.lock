@@ -14698,7 +14698,7 @@ __metadata:
 
 "@terasky/backstage-plugin-kubernetes-ingestor@patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch":
   version: 3.15.0
-  resolution: "@terasky/backstage-plugin-kubernetes-ingestor@patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch::version=3.15.0&hash=8a5f95"
+  resolution: "@terasky/backstage-plugin-kubernetes-ingestor@patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch::version=3.15.0&hash=887d58"
   dependencies:
     "@backstage/backend-defaults": "npm:^0.17.0"
     "@backstage/backend-plugin-api": "npm:^1.9.0"
@@ -14720,7 +14720,7 @@ __metadata:
     js-yaml: "npm:^4.1.0"
     node-fetch: "npm:^2.7.0"
     pluralize: "npm:^8.0.0"
-  checksum: 10c0/eb097d8a5f215a1f70db91b7f15edb4a9eee4559deb71f91b54bfa0f6efb817428e38cf80ccd733d21ba722ed785090692008ec3ee7a682409fbc115d952f256
+  checksum: 10c0/df344285fdf0f9ad111173dc0aa93f377cfab507f8f8cba7c917384f178992a4af5eb67c7ebb095e2e5f34b908f6b74034fdb294a73eb5d82ef07af407878ffc
   languageName: node
   linkType: hard
 
