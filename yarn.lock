@@ -14698,7 +14698,7 @@ __metadata:
 
 "@terasky/backstage-plugin-kubernetes-ingestor@patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch":
   version: 3.15.0
-  resolution: "@terasky/backstage-plugin-kubernetes-ingestor@patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch::version=3.15.0&hash=887d58"
+  resolution: "@terasky/backstage-plugin-kubernetes-ingestor@patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch::version=3.15.0&hash=9b85c6"
   dependencies:
     "@backstage/backend-defaults": "npm:^0.17.0"
     "@backstage/backend-plugin-api": "npm:^1.9.0"
@@ -14720,7 +14720,7 @@ __metadata:
     js-yaml: "npm:^4.1.0"
     node-fetch: "npm:^2.7.0"
     pluralize: "npm:^8.0.0"
-  checksum: 10c0/df344285fdf0f9ad111173dc0aa93f377cfab507f8f8cba7c917384f178992a4af5eb67c7ebb095e2e5f34b908f6b74034fdb294a73eb5d82ef07af407878ffc
+  checksum: 10c0/a5c8cd155e7d488bc467a601df10cd201cd22c2237cc9495568cbd8b8f58ed5f1d7db65daea501a7edb295c7f60baadb34260e1911be5225eeb75a24b63225be
   languageName: node
   linkType: hard
 
@@ -17650,12 +17650,16 @@ __metadata:
     "@backstage/plugin-search-backend-node": "npm:^1.4.2"
     "@backstage/plugin-signals-backend": "npm:^0.3.13"
     "@backstage/plugin-techdocs-backend": "npm:^2.1.6"
+    "@rjsf/utils": "npm:5.24.13"
+    "@rjsf/validator-ajv8": "npm:5.24.13"
     "@terasky/backstage-plugin-kubernetes-ingestor": "patch:@terasky/backstage-plugin-kubernetes-ingestor@npm%3A3.15.0#~/.yarn/patches/@terasky-backstage-plugin-kubernetes-ingestor-npm-3.15.0-f1d878075e.patch"
     "@terasky/backstage-plugin-scaffolder-backend-module-terasky-utils": "npm:^2.7.0"
+    "@types/react": "npm:^18"
     app: "link:../app"
     better-sqlite3: "npm:^12.0.0"
     node-gyp: "npm:^10.0.0"
     pg: "npm:^8.11.3"
+    react: "npm:18.3.1"
     yaml: "npm:^2.8.3"
   languageName: unknown
   linkType: soft
@@ -31511,7 +31515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.0.2":
+"react@npm:18.3.1, react@npm:^18.0.2":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:

@@ -29,6 +29,27 @@ spec:
                   properties:
                     repository:
                       type: string
+                services:
+                  type: array
+                  items:
+                    type: object
+                    required: [name, image, port]
+                    properties:
+                      name:
+                        type: string
+                      image:
+                        type: string
+                      port:
+                        type: integer
+                      build:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            default: false
+                          context:
+                            type: string
+                            default: '.'
 status:
   controllers:
     compositeResourceType:

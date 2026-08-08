@@ -53,7 +53,47 @@ index 31953fd9f6952f0f4585a761f591727b22acdfb4..64102601880642f2b3f5b49decabfb69
      }
      mainParameterGroup.properties.owner = {
        title: "Owner",
-@@ -1204,6 +1212,9 @@ class XRDTemplateEntityProvider {
+@@ -659,20 +667,37 @@ class XRDTemplateEntityProvider {
+           } else {
+             delete processedProperties[key].required;
+           }
+           if (subProps.enabled && subProps.enabled.type === "boolean") {
+             const siblingKeys = Object.keys(processedProperties[key].properties).filter((k) => k !== "enabled");
++            const conditionalProperties = Object.fromEntries(
++              siblingKeys.map((k) => {
++                const originalProperty = typedValue.properties[k];
++                return [
++                  k,
++                  originalProperty?.default !== void 0
++                    ? { ...processedProperties[key].properties[k], default: originalProperty.default }
++                    : processedProperties[key].properties[k]
++                ];
++              })
++            );
++            const disabledDefaults = Object.fromEntries(
++              siblingKeys.filter((k) => typedValue.properties[k]?.default !== void 0).map(
++                (k) => [k, { ...conditionalProperties[k], "ui:widget": "hidden" }]
++              )
++            );
+             processedProperties[key].dependencies = {
+               ...processedProperties[key].dependencies,
+               enabled: {
+                 if: {
+                   properties: {
+                     enabled: { const: true }
+                   }
+                 },
+                 then: {
+-                  properties: siblingKeys.reduce((acc, k) => ({ ...acc, [k]: processedProperties[key].properties[k] }), {})
++                  properties: conditionalProperties
+-                }
++                },
++                ...(Object.keys(disabledDefaults).length > 0 ? { else: { properties: disabledDefaults } } : {})
+               }
+             };
+             siblingKeys.forEach((k) => delete processedProperties[key].properties[k]);
+           }
+@@ -1204,6 +1229,9 @@ class XRDTemplateEntityProvider {
        case "bitbucketcloud":
          action = "publish:bitbucketCloud:pull-request";
          break;
@@ -63,7 +103,7 @@ index 31953fd9f6952f0f4585a761f591727b22acdfb4..64102601880642f2b3f5b49decabfb69
        case "github":
        default:
          action = "publish:github:pull-request";
-@@ -1238,7 +1249,7 @@ class XRDTemplateEntityProvider {
+@@ -1238,7 +1266,7 @@ class XRDTemplateEntityProvider {
      title: Create {KIND} Resource \${{ parameters.xrName }}
      description: Create {KIND} Resource \${{ parameters.xrName }}
      targetBranchName: ${this.config.getOptionalString("kubernetesIngestor.crossplane.xrds.publishPhase.git.targetBranch")}
@@ -72,7 +112,7 @@ index 31953fd9f6952f0f4585a761f591727b22acdfb4..64102601880642f2b3f5b49decabfb69
          defaultStepsYaml += repoHardcodedStepsYaml;
        }
      }
-@@ -1943,6 +1954,9 @@ class XRDTemplateEntityProvider {
+@@ -1943,6 +1971,9 @@ class XRDTemplateEntityProvider {
        case "bitbucketcloud":
          action = "publish:bitbucketCloud:pull-request";
          break;
